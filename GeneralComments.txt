@@ -1,0 +1,21 @@
+There are a few things I don't like about the final datasets created by this project but seem necessary to complete the assignment without risking alterations to or misrepresentations of the original data.
+
+1.  The variable names used throughout the data include multiple abbreviations that can lead to confusion, could be more descriptive, or have repeated descriptors.  These variable names were kept because expanding them quickly becomes unmanageable and because, given my limited understanding of the data collection and how it was processed, I could not clearly determine the reasoning behind some of the feature names in the included literature.  As an example:
+
+original:
+ tAcc-XYZ
+could be easily changed to:
+ TimeAccelerometerXYZ
+
+but, the original:
+ fBodyBodyGyroJerkMagStd
+can't be as easily changed as it's unclear if it should be:
+ FrequencyBodyAngularAccelerationMagneticStandardDeviation or something entirely different.
+
+Regardless, some of the variable names become extremely large.  As a result, I chose to leave the variable names largely unchanged, except for a few format changes that facilitate easier sorting and reading.
+
+2.  The inclusion of the "Set", "Activity", and "Subject" columns could be considered different types of observational units and should therefore be separated into different tables.  I chose not to do so because the end goal was to summarize the averages of the variables among "Activity" and "Subject" groupings.  The column "Set" was included because it seemed responsible to keep the "Training" and "Test" groupings in case they were needed, even though they didn't seem relevant in this instance.
+
+3.  I'm new to using with R and manipulating data.  Any feedback with reasons for changes would be greatly appreciated!
+
+
