@@ -32,10 +32,8 @@ Posted files:
 The README provided through the data URL is provided below.  It describes how the data was collected and complied.  The cited files are not posted in this repo, but are available through the data URL.
 
 Readme.txt
-
 Human Activity Recognition Using Smartphones Dataset
 Version 1.0
-
 Jorge L. Reyes-Ortiz, Davide Anguita, Alessandro Ghio, Luca Oneto.
 Smartlab - Non Linear Complex Systems Laboratory
 DITEN - Universit‡ degli Studi di Genova.
