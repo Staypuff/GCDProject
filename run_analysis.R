@@ -19,13 +19,15 @@ df <- function(dir = "./gcdproject/") {
         for(i in c("test", "train")){
                 label <- read.table(paste0(dir, "y_", i, ".txt"), header = FALSE, col.names = "Activity")
                 data <- read.table(paste0(dir, "x_", i, ".txt"))
-                subject <- read.table(paste0(dir, "subject_", i, ".txt"), col.names = "Subject", colClasses = "character")
+                subject <- read.table(paste0(dir, "subject_", i, ".txt"), col.names = "Subject", colClasses = "integer")
                 activity <- read.table(paste0(dir, "activity_labels.txt"), col.names = c("Key", "Activity"), colClasses = "character")
                 features <- read.table(paste0(dir, "features.txt"), stringsAsFactors = FALSE)
                 activity[,2] <- sapply(activity[,2], tolower)
                 colnames(data) <- gsub("-|,|[()]| ", "", features[,2]) %>%
                         gsub("mean", "Mean", .) %>% gsub("std", "Std", .) %>%
-                        gsub("angle", "Angle", .) %>% gsub("gravity", "Gravity", .)
+                        gsub("angle", "Angle", .) %>% gsub("gravity", "Gravity", .) %>%
+                        gsub("Acc", "Acceleration", .) %>% gsub("^t", "Time", .) %>%
+                        gsub("^f|Freq", "Frequency", .) %>% gsub("Gyro", "Gyroscope", .)
                 meanstd <- grep("[Mm][Ee][Aa][Nn]|[Ss][Tt][Dd]", features[,2])
                 data <- data[,meanstd]
                 table <- data.frame(label, subject, data, stringsAsFactors = FALSE)
@@ -38,21 +40,10 @@ df <- function(dir = "./gcdproject/") {
 }
 
 average <- function(x = dfdata) {
-        sumbyA <- tbl_df(x) %>% 
-                rename(Group = Activity) %>%
-                select(-c(Set, Subject)) %>% 
-                group_by(Group) %>%
-                summarize_at(vars(tBodyAccMeanX:AngleZGravityMean), mean)
-        sumbyS <- tbl_df(x) %>% 
-                rename(Group = Subject) %>%
-                select(-c(Set, Activity)) %>% 
-                group_by(Group) %>%
+        final <- tbl_df(x) %>% 
+                select(-Set) %>% 
+                group_by(Activity, Subject) %>%
                 summarize_all(mean)
-        sumbyS[,1] <- sapply(sumbyS$Group, function(x) if(x %in% as.character(1:9)){paste0("0",x)} else{x})
-        sumbyS[,1] <- sapply(sumbyS$Group, function(x) paste0("Subject_", x))
-        sumbyA[,1] <- sapply(sumbyA$Group, function(x) paste0("Activity_", x))
-        final <- rbind(sumbyA, sumbyS)
-        colnames(final)[2:87] <- sapply(colnames(final)[2:87], function(x) paste0("Avg_",x))
-        average <<- arrange(final, Group)
+        average <<- arrange(final, Activity, Subject)
 }
 

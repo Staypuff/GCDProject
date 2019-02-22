@@ -37,18 +37,19 @@ df <- function(dir = "./gcdproject/") {
 #Reads the data into R; the columns are the features described in the “features_info.txt” file
                 data <- read.table(paste0(dir, "x_", i, ".txt"))
 #Reads the subject data into R; this will be the “Subject” column in the data set
-                subject <- read.table(paste0(dir, "subject_", i, ".txt"), col.names = "Subject", colClasses = "character")
+                subject <- read.table(paste0(dir, "subject_", i, ".txt"), col.names = "Subject", colClasses = "integer")
 #Reads the activity key into R; this will be used to for descriptive activity names
                 activity <- read.table(paste0(dir, "activity_labels.txt"), col.names = c("Key", "Activity"), colClasses = "character")
 #Reads the features key into R; this will be used for descriptive variable names
                 features <- read.table(paste0(dir, "features.txt"), stringsAsFactors = FALSE)
 #Changes activity observations to lower case
                 activity[,2] <- sapply(activity[,2], tolower)
-#Assigns descriptive variable names to the data using the “features” key; tidies the variable names using 
-multiple “gsub” function calls
+#Assigns descriptive variable names to the data using the “features” key; tidies the variable names using multiple “gsub” function calls
                 colnames(data) <- gsub("-|,|[()]| ", "", features[,2]) %>%
                         gsub("mean", "Mean", .) %>% gsub("std", "Std", .) %>%
-                        gsub("angle", "Angle", .) %>% gsub("gravity", "Gravity", .)
+                        gsub("angle", "Angle", .) %>% gsub("gravity", "Gravity", .) %>%
+                        gsub("Acc", "Acceleration", .) %>% gsub("^t", "Time", .) %>%
+                        gsub("^f|Freq", "Frequency", .) %>% gsub("Gyro", "Gyroscope", .)
 #Filters the mean and standard deviation feature locations into a vector, “meanstd”
                 meanstd <- grep("[Mm][Ee][Aa][Nn]|[Ss][Tt][Dd]", features[,2])
 #Uses the “meanstd” vector to filter the data set, giving only mean and std variables
@@ -74,31 +75,13 @@ multiple “gsub” function calls
 #Creates “average” function
 average <- function(x = dfdata) {
 #Applies dplyr function “tbl_df” to input data frame for follow on dplyr functions
-        sumbyA <- tbl_df(x) %>% 
-#Renames Activity column to “Group” for easier data merging later
-                rename(Group = Activity) %>%
+        final <- tbl_df(x) %>% 
 #Removes the Set and Subject columns
-                select(-(Set, Subject)) %>%
-#Groups by Activity (Group) 
-                group_by(Group) %>%
-#Creates new data frame consisting of averages of all variables by Group (Activity)
+                select(-Set) %>%
+#Groups by Activity, then by Subject
+                group_by(Activity, Subject) %>%
+#Creates new data frame consisting of averages of all variables by Activity, Subject
                 summarize_all(mean)
-#Does the same as sumbyA, but for Subject grouping
-        sumbyS <- tbl_df(x) %>% 
-                rename(Group = Subject) %>%
-                select(-(Set, Activity)) %>% 
-                group_by(Group) %>%
-                summarize_at(vars(tBodyAccMeanX:AngleZGravityMean), mean)
-#Creates one data set from Activity and Subject mean summaries
-        final <- rbind(sumbyA, sumbyS)
-#Adds a leading “0” to Subjects 1-9 in Group, giving 01-09 for arranging characters
-        final[,1] <- sapply(final$Group, function(x) if(x %in% as.character(1:9)){paste0("0",x)} else{x})
-#Adds leading “Subject” to subjects 1-30 to make observation names more descriptive
-        final[,1] <- sapply(final$Group, function(x) paste("Subject", x))
-#Adds leading "Activity" to activities
-        sumbyA[,1] <- sapply(sumbyA$Group, function(x) paste0("Activity_", x))
-#Adds leading "Avg_" to columns to indicate these are averages of previous measurements
-        colnames(final)[2:87] <- sapply(colnames(final)[2:87], function(x) paste0("Avg_", x))
-#Sorts the Groups and assigns to global variable
-        average <<- arrange(final, Group)
+#Sorts by Activity, Group and assigns to global variable
+        average <<- arrange(final, Activity, Subject)
 }

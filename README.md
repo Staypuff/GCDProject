@@ -26,7 +26,6 @@ Posted files:
 4. run_analysis.R - the R code created to accomplish the project objectives
 5. CodeComments.txt - Line by line comments describing the run_analysis.R code; any feedback on efficiency, format, or anything else is greatly appreciated!
 6. Codebook.md - describes the variables, summaries calculated, units, and other relevant information
-7. GeneralComments.txt - provides reasoning for how the data sets are presented
 
 
 The README provided through the data URL is provided below.  It describes how the data was collected and complied.  The cited files are not posted in this repo, but are available through the data URL.
