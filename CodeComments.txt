@@ -1,5 +1,5 @@
-Rstudio Version:
-Version 1.1.463 – © 2009-2018 RStudio, Inc.
+R Version:  R 3.5.2 GUI 1.70 El Capitan build (7612)
+Rstudio Version:  Version 1.1.463 – © 2009-2018 RStudio, Inc.
 Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/605.1.15 (KHTML, like Gecko)
 
 The following is a line by line explanation of the run_analysis.R code created from the required steps in the Getting and Cleaning Data final project; the explanation will be above the line of code it describes:
@@ -8,10 +8,10 @@ The following is a line by line explanation of the run_analysis.R code created f
 library(dplyr)
 
 ##This code block creates a function that downloads the required data files into a created or existing directory called “gcdproject”.
-#Creates “download.data” function
-download.data <- function () {
+#Creates “download.data” function where argument, directory, is desired directory path
+download.data <- function (directory = "./gcdproject") {
 #Creates “gcdproject” directory if it does not already exist
-        if(!file.exists("./gcdproject")){dir.create("./gcdproject")}
+        if(!file.exists(directory)){dir.create(directory)}
 #Assigns the provided URL to “fileUrl”
         fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
 #Creates a temporary directory named “td”
@@ -21,15 +21,17 @@ download.data <- function () {
 #Downloads the linked file using the provided URL into the empty temporary file “tf”
         download.file(fileUrl, tf)
 #Unzips the downloaded .zip file into the “gcdproject” directory without any subfolders for ease of use
-        unzip(tf, exdir = "./gcdproject", junkpaths = TRUE)
+        unzip(tf, exdir = directory, junkpaths = TRUE)
+#Assigns directory as a global variable for later functions to use        
+        directory <<- directory
 }
 
 
 
 ## This code block creates a function that merges the data files into a single data set, extracts the measurements on the mean and standard deviation for each measurement, uses descriptive activity names to name the activities, and labels the data set with descriptive variable names (the required assignment steps).  The chosen variable names include abbreviations (e.g. “tBodyAccJerkMagMean”) which are not usually preferred; however, clearer descriptive names such as “TimeBodyAccelerometerJerkMagneticMean” make viewing the data more difficult, as the column widths quickly become too large.  Because of this, a compromise was made using some abbreviations in variable names.
 
-#Creates “df” function using a preassigned argument “dir”
-df <- function(dir = "./gcdproject/") {
+#Creates “data.set” function using argument “dir”
+data.set <- function(dir = directory) {
 #Sets up a “for” loop using a vector with values “test” and “train”
         for(i in c("test", "train")){
 #Reads the data labels into R; this will be the “Activity” column in the data set
@@ -37,21 +39,21 @@ df <- function(dir = "./gcdproject/") {
 #Reads the data into R; the columns are the features described in the “features_info.txt” file
                 data <- read.table(paste0(dir, "x_", i, ".txt"))
 #Reads the subject data into R; this will be the “Subject” column in the data set
-                subject <- read.table(paste0(dir, "subject_", i, ".txt"), col.names = "Subject", colClasses = "integer")
+                subject <- read.table(paste0(dir, "subject_", i, ".txt"), col.names = "Subject")
 #Reads the activity key into R; this will be used to for descriptive activity names
-                activity <- read.table(paste0(dir, "activity_labels.txt"), col.names = c("Key", "Activity"), colClasses = "character")
+                activity <- read.table(paste0(dir, "activity_labels.txt"), colClasses = "character")
 #Reads the features key into R; this will be used for descriptive variable names
                 features <- read.table(paste0(dir, "features.txt"), stringsAsFactors = FALSE)
 #Changes activity observations to lower case
                 activity[,2] <- sapply(activity[,2], tolower)
 #Assigns descriptive variable names to the data using the “features” key; tidies the variable names using multiple “gsub” function calls
                 colnames(data) <- gsub("-|,|[()]| ", "", features[,2]) %>%
-                        gsub("mean", "Mean", .) %>% gsub("std", "Std", .) %>%
+                        gsub("mean", "Mean", .) %>% gsub("std", "Stdev", .) %>%
                         gsub("angle", "Angle", .) %>% gsub("gravity", "Gravity", .) %>%
                         gsub("Acc", "Acceleration", .) %>% gsub("^t", "Time", .) %>%
                         gsub("^f|Freq", "Frequency", .) %>% gsub("Gyro", "Gyroscope", .)
 #Filters the mean and standard deviation feature locations into a vector, “meanstd”
-                meanstd <- grep("[Mm][Ee][Aa][Nn]|[Ss][Tt][Dd]", features[,2])
+                meanstd <- grep("Mean|Stdev", features[,2])
 #Uses the “meanstd” vector to filter the data set, giving only mean and std variables
                 data <- data[,meanstd]
 #Creates a data frame named “table” with “label” (activity), “subject”, and “data” (feature variables) columns
@@ -66,16 +68,16 @@ df <- function(dir = "./gcdproject/") {
                 assign(paste(i), table)
         }
 #Creates a composite data frame using “train” and “test” and assigns to global variable
-        dfdata <<- rbind(train, test)
+        dataframe <<- rbind(train, test)
 }
 
 
 ## This code block creates a function that returns a data set from the “dfdata” created by the “df” function above.  The resulting data set contains the averages of each variable for each activity and each subject under a new variable column named “Group”.
 
 #Creates “average” function
-average <- function(x = dfdata) {
+average <- function(data = dataframe) {
 #Applies dplyr function “tbl_df” to input data frame for follow on dplyr functions
-        final <- tbl_df(x) %>% 
+        final <- tbl_df(data) %>% 
 #Removes the Set and Subject columns
                 select(-Set) %>%
 #Groups by Activity, then by Subject
@@ -83,5 +85,5 @@ average <- function(x = dfdata) {
 #Creates new data frame consisting of averages of all variables by Activity, Subject
                 summarize_all(mean)
 #Sorts by Activity, Group and assigns to global variable
-        average <<- arrange(final, Activity, Subject)
+        averages <<- arrange(final, Activity, Subject)
 }
