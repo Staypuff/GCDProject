@@ -25,11 +25,11 @@ data.set <- function(dir = directory) {
                 features <- read.table(paste0(dir, "/features.txt"), stringsAsFactors = FALSE)
                 activity[,2] <- sapply(activity[,2], tolower)
                 colnames(data) <- gsub("-|,|[()]| ", "", features[,2]) %>%
-                        gsub("mean", "Mean", .) %>% gsub("std", "Std", .) %>%
+                        gsub("mean", "Mean", .) %>% gsub("std", "Stdev", .) %>%
                         gsub("angle", "Angle", .) %>% gsub("gravity", "Gravity", .) %>%
                         gsub("Acc", "Acceleration", .) %>% gsub("^t", "Time", .) %>%
                         gsub("^f|Freq", "Frequency", .) %>% gsub("Gyro", "Gyroscope", .)
-                meanstd <- grep("[Mm][Ee][Aa][Nn]|[Ss][Tt][Dd]", features[,2])
+                meanstd <- grep("Mean|Stdev", features[,2])
                 data <- data[,meanstd]
                 table <- data.frame(label, subject, data, stringsAsFactors = FALSE)
                 table[,1] <- activity[,2][match(unlist(table[,1]), activity[,1])]
@@ -43,7 +43,7 @@ data.set <- function(dir = directory) {
 ## Creates a new dataset consisting of averages of above variables for each Activity and Subject.
 
 average <- function(data = dataframe) {
-        final <- tbl_df(dataframe) %>% 
+        final <- tbl_df(data) %>% 
                 select(-Set) %>% 
                 group_by(Activity, Subject) %>%
                 summarize_all(mean)
