@@ -15,13 +15,13 @@ download.data <- function () {
         unzip(tf, exdir = "./gcdproject", junkpaths = TRUE)
 }
 ##Merges the training and the test datasets to create one data set and filters Mean / Std
-df <- function(dir = "./gcdproject/") {
+df <- function(dir = "./gcdproject") {
         for(i in c("test", "train")){
-                label <- read.table(paste0(dir, "y_", i, ".txt"), header = FALSE, col.names = "Activity")
-                data <- read.table(paste0(dir, "x_", i, ".txt"))
-                subject <- read.table(paste0(dir, "subject_", i, ".txt"), col.names = "Subject", colClasses = "integer")
-                activity <- read.table(paste0(dir, "activity_labels.txt"), col.names = c("Key", "Activity"), colClasses = "character")
-                features <- read.table(paste0(dir, "features.txt"), stringsAsFactors = FALSE)
+                label <- read.table(paste0(dir, "/y_", i, ".txt"), header = FALSE, col.names = "Activity")
+                data <- read.table(paste0(dir, "/x_", i, ".txt"))
+                subject <- read.table(paste0(dir, "/subject_", i, ".txt"), col.names = "Subject", colClasses = "integer")
+                activity <- read.table(paste0(dir, "/activity_labels.txt"), col.names = c("Key", "Activity"), colClasses = "character")
+                features <- read.table(paste0(dir, "/features.txt"), stringsAsFactors = FALSE)
                 activity[,2] <- sapply(activity[,2], tolower)
                 colnames(data) <- gsub("-|,|[()]| ", "", features[,2]) %>%
                         gsub("mean", "Mean", .) %>% gsub("std", "Std", .) %>%
