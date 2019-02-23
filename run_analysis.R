@@ -6,16 +6,17 @@
 ## dplyr package needed only for "average" function below
 library(dplyr)
 ## download.data() creates directory and downloads the data
-download.data <- function () {
-        if(!file.exists("./gcdproject")){dir.create("./gcdproject")}
+download.data <- function (directory = "./gcdproject") {
+        if(!file.exists(directory)){dir.create(directory)}
         fileUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
         td <- tempdir()
         tf <- tempfile(tmpdir = td, fileext = ".zip")
         download.file(fileUrl, tf)
-        unzip(tf, exdir = "./gcdproject", junkpaths = TRUE)
+        unzip(tf, exdir = directory, junkpaths = TRUE)
+        directory <<- directory
 }
 ##Merges the training and the test datasets to create one data set and filters Mean / Std
-df <- function(dir = "./gcdproject") {
+data.set <- function(dir = directory) {
         for(i in c("test", "train")){
                 label <- read.table(paste0(dir, "/y_", i, ".txt"), header = FALSE, col.names = "Activity")
                 data <- read.table(paste0(dir, "/x_", i, ".txt"))
@@ -36,13 +37,13 @@ df <- function(dir = "./gcdproject") {
                 colnames(table)[1] = "Set"
                 assign(paste(i), table)
         }
-        dfdata <<- rbind(train, test)
+        dataframe <<- rbind(train, test)
 }
 
 ## Creates a new dataset consisting of averages of above variables for each Activity and Subject.
 
-average <- function(x = dfdata) {
-        final <- tbl_df(x) %>% 
+average <- function(data = dataframe) {
+        final <- tbl_df(dataframe) %>% 
                 select(-Set) %>% 
                 group_by(Activity, Subject) %>%
                 summarize_all(mean)
