@@ -44,13 +44,13 @@ tBodyGyroJerkMean
 
 From the 561 original variables, only the means and standard deviations were included per the requirements of the assignment.  These variable names were adjusted to be easier to read and are listed below.  Reference the CodeComments.txt file for specific changes.
 
-The following variables were added to the data set:
+The following variables were added to the new dataset (dataset.txt):
 
-Set:  "Train" or "Test", retaining the 2 groupings of subjects stated in the README
-Activity:  walking, walking_upstairs, walking_downstairs, sitting, standing, laying
-Subject: a number 1 through 30 representing the individual subject volunteers
+Set:  "Train" or "Test", retaining the 2 groupings of subjects stated in the README  
+Activity:  walking, walking_upstairs, walking_downstairs, sitting, standing, laying  
+Subject: an integer, 1 through 30, representing the individual subject volunteers  
 
-The full list of the variables in the updated data set follow:
+The full list of the variables in the updated dataset (dataset.txt) follows:
  
  [1] "Set"                                              
  [2] "Activity"                                         
@@ -143,7 +143,7 @@ The full list of the variables in the updated data set follow:
 [89] "AngleZGravityMean"
 
 
-The summarized data in the separate data set consist of the averages (mean) of the above variables by activity and by subject as required by the project overview. The variables are averages of previously derived means and standard deviations, retaining the same units.
+The summarized data in the "average.txt" dataset consist of means of the above variables by activity and by subject as required by the project overview. The variables are averages of previously derived means and standard deviations, retaining the same units.  The columns are listed below:
 
  [1] "Activity"                                         
  [2] "Subject"                                          
