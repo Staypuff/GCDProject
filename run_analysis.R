@@ -1,9 +1,9 @@
 ## These functions download the required files,
-## merge the the data into a single data set,
-## including only the mean and standard deviation variables.
-## See the run_analysis.R readme for line by line comments
+## merge the the data into a single data set, and
+## filter only the mean and standard deviation variables.
+## See the CodeComments.txt file for line by line comments.
 
-## dplyr package needed for "group.average" function
+## dplyr package needed only for "average" function below
 library(dplyr)
 ## download.data() creates directory and downloads the data
 download.data <- function () {
@@ -14,7 +14,7 @@ download.data <- function () {
         download.file(fileUrl, tf)
         unzip(tf, exdir = "./gcdproject", junkpaths = TRUE)
 }
-##Merges the training and the test sets to create one data set and filters Mean / Std
+##Merges the training and the test datasets to create one data set and filters Mean / Std
 df <- function(dir = "./gcdproject/") {
         for(i in c("test", "train")){
                 label <- read.table(paste0(dir, "y_", i, ".txt"), header = FALSE, col.names = "Activity")
@@ -38,6 +38,8 @@ df <- function(dir = "./gcdproject/") {
         }
         dfdata <<- rbind(train, test)
 }
+
+## Creates a new dataset consisting of averages of above variables for each Activity and Subject.
 
 average <- function(x = dfdata) {
         final <- tbl_df(x) %>% 
